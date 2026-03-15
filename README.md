@@ -8,8 +8,8 @@ WeddingVerse is a comprehensive, modern, full-stack marketplace connecting coupl
 * **Database:** PostgreSQL (via Prisma ORM) - Currently using Supabase
 
 ## Live Demo
-- **Frontend:** https://weddingverse.onrender.com (or Vercel)
-- **Backend API:** http://localhost:5000 (local) / Deployed on Render
+- **Frontend:** https://weddingverse.vercel.app
+- **Backend API:** https://weddingverse-api.onrender.com
 
 ## Project Structure
 * `/client` - The React frontend application. Contains the complete cinematic luxury landing page.
@@ -76,43 +76,3 @@ WeddingVerse is a comprehensive, modern, full-stack marketplace connecting coupl
    npm run dev
    ```
 5. Open `http://localhost:5173` in your browser to view the cinematic landing page.
-
----
-
-## Deployment Strategy
-
-### Option 1: Supabase + Render + Vercel (Recommended)
-
-#### 1. Database -> Supabase (PostgreSQL)
-1. Create an account on [Supabase](https://supabase.com/).
-2. Create a new Project and note down the Connection String (URI).
-3. Use the Supabase SQL Editor to run the contents of `database/schema.sql` and `database/seed.sql`.
-
-#### 2. Backend -> Render
-1. Create an account on [Render](https://render.com/).
-2. Create a new "Web Service" connected to your GitHub repository.
-3. **Settings:**
-   - Root Directory: `server`
-   - Build Command: `npm install && npx prisma generate`
-   - Start Command: `node src/index.js`
-4. **Environment Variables:**
-   - Add `DATABASE_URL` (From Supabase)
-   - Add `JWT_SECRET` (A long random string)
-   - Add `NODE_ENV = production`
-5. Deploy. Note the Render URL (e.g., `https://weddingverse-api.onrender.com`).
-
-#### 3. Frontend -> Vercel
-1. Create an account on [Vercel](https://vercel.com/).
-2. Import your GitHub repository.
-3. **Settings:**
-   - Framework Preset: Vite
-   - Root Directory: `client`
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-4. **Environment Variables:**
-   - Add `VITE_API_URL` pointing to your Render backend URL (e.g., `https://weddingverse-api.onrender.com/api/v1`).
-5. Deploy. Vercel will give you a live HTTPS URL for the frontend.
-
-### Option 2: All-in-One (Frontend + Backend on Render)
-1. Deploy both frontend and backend from a single Render service using a custom start script.
-2. This requires modifying the package.json to serve the built React app from Express.
