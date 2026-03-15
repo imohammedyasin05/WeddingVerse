@@ -8,7 +8,7 @@ WeddingVerse is a comprehensive, modern, full-stack marketplace connecting coupl
 * **Database:** PostgreSQL (via Prisma ORM) - Currently using Supabase
 
 ## Live Demo
-- **Frontend:** https://weddingverse.vercel.app
+- **Frontend:** https://wedding-verse-49sp.vercel.app
 - **Backend API:** https://weddingverse-api.onrender.com
 
 ## Project Structure
