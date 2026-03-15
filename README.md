@@ -1,11 +1,15 @@
 # WeddingVerse - Full Stack Wedding Services Platform
 
-WeddingVerse is a comprehensive, modern, full-stack marketplace connecting couples with elite wedding vendors. 
+WeddingVerse is a comprehensive, modern, full-stack marketplace connecting couples with elite wedding vendors.
 
 ## Tech Stack
 * **Frontend:** React, Vite, Tailwind CSS, Framer Motion, Lucide React
 * **Backend:** Node.js, Express.js
-* **Database:** PostgreSQL (via Prisma ORM)
+* **Database:** PostgreSQL (via Prisma ORM) - Currently using Supabase
+
+## Live Demo
+- **Frontend:** https://weddingverse.onrender.com (or Vercel)
+- **Backend API:** http://localhost:5000 (local) / Deployed on Render
 
 ## Project Structure
 * `/client` - The React frontend application. Contains the complete cinematic luxury landing page.
@@ -77,12 +81,14 @@ WeddingVerse is a comprehensive, modern, full-stack marketplace connecting coupl
 
 ## Deployment Strategy
 
-### 1. Database -> Supabase (PostgreSQL)
+### Option 1: Supabase + Render + Vercel (Recommended)
+
+#### 1. Database -> Supabase (PostgreSQL)
 1. Create an account on [Supabase](https://supabase.com/).
 2. Create a new Project and note down the Connection String (URI).
 3. Use the Supabase SQL Editor to run the contents of `database/schema.sql` and `database/seed.sql`.
 
-### 2. Backend -> Render
+#### 2. Backend -> Render
 1. Create an account on [Render](https://render.com/).
 2. Create a new "Web Service" connected to your GitHub repository.
 3. **Settings:**
@@ -95,7 +101,7 @@ WeddingVerse is a comprehensive, modern, full-stack marketplace connecting coupl
    - Add `NODE_ENV = production`
 5. Deploy. Note the Render URL (e.g., `https://weddingverse-api.onrender.com`).
 
-### 3. Frontend -> Vercel
+#### 3. Frontend -> Vercel
 1. Create an account on [Vercel](https://vercel.com/).
 2. Import your GitHub repository.
 3. **Settings:**
@@ -106,3 +112,7 @@ WeddingVerse is a comprehensive, modern, full-stack marketplace connecting coupl
 4. **Environment Variables:**
    - Add `VITE_API_URL` pointing to your Render backend URL (e.g., `https://weddingverse-api.onrender.com/api/v1`).
 5. Deploy. Vercel will give you a live HTTPS URL for the frontend.
+
+### Option 2: All-in-One (Frontend + Backend on Render)
+1. Deploy both frontend and backend from a single Render service using a custom start script.
+2. This requires modifying the package.json to serve the built React app from Express.
