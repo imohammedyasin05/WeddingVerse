@@ -1,0 +1,138 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model
+model User {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String    @db.VarChar(100)
+  email         String    @unique @db.VarChar(255)
+  password_hash String    @db.VarChar(255)
+  phone         String?   @db.VarChar(20)
+  avatar_url    String?
+  role          UserRole  @default(couple)
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  // Relations
+  vendor        Vendor?
+  inquiries     Inquiry[]
+  reviews       Review[]
+
+  @@map("users")
+}
+
+// Vendor Model
+model Vendor {
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id         String      @unique @db.Uuid
+  user            User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  business_name   String      @db.VarChar(200)
+  slug            String      @unique @db.VarChar(200)
+  category        String      @db.VarChar(100)
+  city            String      @db.VarChar(100)
+  state           String?     @default("Maharashtra") @db.VarChar(100)
+  description     String?
+  cover_image_url String?
+  price_range     PriceCategory @default(mid)
+  avg_rating      Decimal?    @default(0.00) @db.Decimal(3, 2)
+  total_reviews   Int?        @default(0)
+  created_at      DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
+
+  // Relations
+  services        Service[]
+  inquiries       Inquiry[]
+  reviews         Review[]
+
+  @@index([category], map: "idx_vendors_category")
+  @@index([city], map: "idx_vendors_city")
+  @@map("vendors")
+}
+
+// Service Model
+model Service {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendor_id   String   @db.Uuid
+  vendor      Vendor   @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
+  name        String   @db.VarChar(150)
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  is_active   Boolean? @default(true)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  inquiries   Inquiry[]
+
+  @@map("services")
+}
+
+// Inquiry Model
+model Inquiry {
+  id          String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String         @db.Uuid
+  user        User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  vendor_id   String         @db.Uuid
+  vendor      Vendor         @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
+  service_id  String?        @db.Uuid
+  service     Service?       @relation(fields: [service_id], references: [id], onDelete: SetNull)
+  event_date  DateTime?      @db.Date
+  message     String
+  status      InquiryStatus? @default(pending)
+  created_at  DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@index([vendor_id], map: "idx_inquiries_vendor_id")
+  @@index([user_id], map: "idx_inquiries_user_id")
+  @@map("inquiries")
+}
+
+// Review Model
+model Review {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String   @db.Uuid
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  vendor_id   String   @db.Uuid
+  vendor      Vendor   @relation(fields: [vendor_id], references: [id], onDelete: Cascade)
+  rating      Int
+  comment     String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@unique([user_id, vendor_id])
+  @@map("reviews")
+}
+
+// Enums
+enum UserRole {
+  couple
+  planner
+  vendor
+  admin
+
+  @@map("user_role")
+}
+
+enum PriceCategory {
+  budget
+  mid
+  premium
+  luxury
+
+  @@map("price_category")
+}
+
+enum InquiryStatus {
+  pending
+  responded
+  closed
+  booked
+
+  @@map("inquiry_status")
+}
