@@ -38,11 +38,6 @@ const Footer = React.forwardRef((props, ref) => (
 
       <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/5 gap-4 md:gap-0">
         <p className="text-white/40 font-body text-sm text-center md:text-left">© 2026 WeddingVerse</p>
-        <div className="flex items-center justify-center gap-6 text-white/30 font-heading italic text-sm md:text-base">
-          <span>Flora</span>
-          <span>LuxeEvents</span>
-          <span>VowStudio</span>
-        </div>
       </div>
     </div>
   </footer>

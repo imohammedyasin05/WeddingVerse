@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { MapPin, Star, Calendar, Mail, CheckCircle2 } from 'lucide-react';
-import { getVendorById } from '../services/api';
+import { getVendorById, sendInquiry } from '../services/api';
 
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from '@tanstack/react-router';
@@ -25,14 +25,14 @@ export default function VendorDetails() {
       try {
         const res = await getVendorById(id);
         const fetchedVendor = res.data;
-        
+
         // Ensure properties match UI expectations, provide fallbacks if missing
         if (fetchedVendor) {
           fetchedVendor.images = fetchedVendor.image_url ? [fetchedVendor.image_url] : ["https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&q=80"];
           fetchedVendor.services = fetchedVendor.services || [];
           fetchedVendor.reviews = fetchedVendor.reviews || [];
         }
-        
+
         setVendor(fetchedVendor);
       } catch (error) {
         console.error("Failed to fetch vendor details:", error);
@@ -40,9 +40,9 @@ export default function VendorDetails() {
         setVendorLoading(false);
       }
     };
-    
+
     if (id && user) {
-       fetchVendor();
+      fetchVendor();
     }
   }, [id, user, authLoading, navigate]);
 
@@ -127,7 +127,7 @@ export default function VendorDetails() {
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      {[1,2,3,4,5].map(star => (
+                      {[1, 2, 3, 4, 5].map(star => (
                         <Star key={star} className={`w-4 h-4 ${star <= review.rating ? 'text-gold fill-gold' : 'text-white/20'}`} />
                       ))}
                     </div>
@@ -139,12 +139,12 @@ export default function VendorDetails() {
           </section>
         </div>
 
-          {/* Sidebar Inquiry Form */}
+        {/* Sidebar Inquiry Form */}
         <div>
           <div className="lux-glass-strong p-8 rounded-3xl sticky top-32">
             <h3 className="text-2xl font-heading italic text-white mb-2">Send an Inquiry</h3>
             <p className="text-sm font-body text-white/50 mb-8">Reach out to {vendor.name} to check availability and discuss your vision.</p>
-            
+
             <InquiryForm vendorId={vendor.id} />
           </div>
         </div>
@@ -157,14 +157,12 @@ function InquiryForm({ vendorId }) {
   const [formData, setFormData] = useState({ message: '', event_date: '' });
   const [status, setStatus] = useState('idle'); // idle, loading, success, error
   const [errorMsg, setErrorMsg] = useState('');
-  
-  const { sendInquiry } = require('../services/api');
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('loading');
     setErrorMsg('');
-    
+
     try {
       await sendInquiry({
         vendor_id: vendorId,
@@ -174,11 +172,11 @@ function InquiryForm({ vendorId }) {
       setStatus('success');
       setFormData({ message: '', event_date: '' });
     } catch (error) {
-       setStatus('error');
-       setErrorMsg(error.response?.data?.message || 'Failed to send inquiry. Are you logged in?');
+      setStatus('error');
+      setErrorMsg(error.response?.data?.message || 'Failed to send inquiry. Are you logged in?');
     }
   };
-  
+
   if (status === 'success') {
     return (
       <div className="text-center py-8">
@@ -187,7 +185,7 @@ function InquiryForm({ vendorId }) {
         </div>
         <h4 className="text-xl font-heading text-white mb-2">Inquiry Sent!</h4>
         <p className="text-sm text-white/60 font-body">The vendor will get back to you soon.</p>
-        <button 
+        <button
           onClick={() => setStatus('idle')}
           className="mt-6 text-sm text-rose-300 hover:text-white transition-colors"
         >
@@ -204,35 +202,35 @@ function InquiryForm({ vendorId }) {
           {errorMsg}
         </div>
       )}
-      
+
       <div>
         <label className="block text-xs font-body text-white/60 uppercase tracking-wider mb-2">Event Date</label>
         <div className="relative">
           <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-          <input 
-            type="date" 
+          <input
+            type="date"
             required
             value={formData.event_date}
-            onChange={e => setFormData({...formData, event_date: e.target.value})}
-            className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white font-body text-sm focus:border-rose-300/50 outline-none transition-colors [color-scheme:dark]" 
+            onChange={e => setFormData({ ...formData, event_date: e.target.value })}
+            className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white font-body text-sm focus:border-rose-300/50 outline-none transition-colors [color-scheme:dark]"
           />
         </div>
       </div>
-      
+
       <div>
         <label className="block text-xs font-body text-white/60 uppercase tracking-wider mb-2">Message</label>
-        <textarea 
-          required 
-          rows="4" 
+        <textarea
+          required
+          rows="4"
           value={formData.message}
-          onChange={e => setFormData({...formData, message: e.target.value})}
-          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-body text-sm focus:border-rose-300/50 outline-none transition-colors resize-none" 
+          onChange={e => setFormData({ ...formData, message: e.target.value })}
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-body text-sm focus:border-rose-300/50 outline-none transition-colors resize-none"
           placeholder={`Hi, we'd love to chat about booking you for our wedding...`}
         ></textarea>
       </div>
-      
-      <button 
-        type="submit" 
+
+      <button
+        type="submit"
         disabled={status === 'loading'}
         className="w-full bg-rose-400 hover:bg-rose-500 disabled:opacity-50 text-white font-body font-medium py-4 rounded-xl transition-colors shadow-lg shadow-rose-500/20 flex justify-center items-center gap-2"
       >
